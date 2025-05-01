@@ -1,0 +1,6 @@
+*.bam
+*.sam
+*.fastq.gz
+*.fa
+*.vcf
+*.bai
