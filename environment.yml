@@ -1,0 +1,19 @@
+# environment.yml
+name: variant_calling_env # Choose a name for your environment
+channels:
+  - conda-forge
+  - bioconda
+  - defaults
+dependencies:
+  - python>=3.8         # MultiQC dependency
+  - fastqc=0.12.1       # Use specific versions
+  - multiqc=1.19
+  - trimmomatic=0.39
+  - bwa=0.7.17
+  - samtools=1.19.2
+  - bcftools=1.19
+  - snpeff=5.1d         # Check for latest compatible version
+  - openjdk>=8          # Java dependency for Trimmomatic/SnpEff
+  - pigz                # Optional: Faster gzip/bgzip
+  - coreutils           # Provides 'date' on some systems if missing
+
