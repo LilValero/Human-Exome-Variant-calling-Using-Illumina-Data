@@ -1,100 +1,90 @@
-# Human Exome Variant Calling Pipeline (Illumina, Single-End)
+# Human Exome Variant Calling Pipeline
 
-This project demonstrates a full variant calling pipeline for human exome data, executed in a local Conda environment using Illumina FASTQ files from NCBI SRA. It includes read QC, alignment, variant calling, and annotation using well-established bioinformatics tools.
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-> **Project Goal**: Detect and annotate functional variants in a human exome dataset (chr22) and visualize high-impact mutations.
+## Description <a name="description"></a>
 
----
+This repository contains a robust bioinformatics pipeline designed for processing Illumina human exome sequencing data to identify genetic variants (SNPs and InDels). The workflow utilizes a suite of standard, widely-adopted bioinformatics tools within a defined Conda environment to ensure reproducibility.
 
-## 🔬 Summary for Recruiters & Interviewers
+This project demonstrates an end-to-end solution for NGS data analysis, emphasizing automation, quality control, and clear documentation practices suitable for research and development environments.
 
-This project was developed to showcase bioinformatics skills in real-world genomic data analysis. It reflects fluency with standard pipelines, data hygiene, reproducibility practices, and interpretation of high-throughput sequencing results. It is fully documented and reproducible on macOS.
+## Features <a name="features"></a>
 
-- 🧪 **Tools**: FastQC, Trimmomatic, BWA, SAMtools, BCFtools, SnpEff, MultiQC
-- 🧬 **Pipeline**: Illumina FASTQ → QC → Trimming → Alignment → Variant Calling → Annotation → Visualization
-- 💻 **Stack**: Bash, Conda, macOS, HTML, GitHub Pages
-- 🧠 **Skills**: NGS analysis, reproducible workflows, VCF interpretation, shell scripting, documentation
+✨ Key capabilities of this pipeline include:
 
----
+* 🔬 **Quality Control:** Initial assessment of raw sequencing read quality using FastQC.
+* ✂️ **Read Trimming:** Adapter removal and quality filtering of reads via Trimmomatic.
+* 🧬 **Alignment:** Mapping processed reads to a reference genome utilizing BWA-MEM.
+* ⚙️ **Post-Alignment Processing:** Efficient BAM file sorting and indexing with Samtools.
+* 🎯 **Variant Calling:** Accurate identification of SNPs and short InDels using the bcftools `mpileup` and `call` workflow.
+* 🏷️ **Variant Annotation:** Functional consequence prediction and annotation of identified variants using SnpEff.
+* 📊 **Aggregate Reporting:** Consolidation of QC metrics across the workflow into a comprehensive report using MultiQC.
+* 🚀 **Automation:** The entire pipeline is orchestrated via a single, configurable shell script (`pipeline.sh`).
+* 📦 **Reproducibility:** A defined Conda environment (`environment.yml`) ensures consistent results by managing software versions and dependencies.
 
-## 🚀 Pipeline Overview
+## Project Structure <a name="structure"></a>
 
-### 1. 📥 Data Acquisition
-- Dataset: [SRR2138889](https://www.ncbi.nlm.nih.gov/sra/SRR2138889)
-- Source: NCBI SRA
-- Platform: Illumina, single-end
+The repository is organized following standard practices for clarity and maintainability:
 
-### 2. ✅ Quality Control
-- Tool: FastQC + MultiQC
-- Outcome: Per-base quality, overrepresented sequences, adapter contamination
+```text
+.
++-- alignment/            # Output: Sorted BAM files and indices
++-- data/                 # Input: FASTQ reads, reference genome, adapter sequences
+|   +-- adapters/
+|   +-- reference/
++-- docs/                 # Output: HTML reports for GitHub Pages (SnpEff, MultiQC)
++-- logs/                 # Output: Log files from pipeline execution
++-- qc/                   # Output: FastQC reports and MultiQC results directory
++-- trimmed/              # Output: Trimmed FASTQ files
++-- variants/             # Output: VCF files and SnpEff annotation directory
+|   +-- snpEff_annotation/
++-- .gitignore            # Configuration: Specifies intentionally untracked files
++-- environment.yml       # Configuration: Conda environment definition
++-- LICENSE               # Documentation: Project license details
++-- pipeline.sh           # Core: Main pipeline execution script
++-- README.md             # Documentation: This file
 
-### 3. ✂️ Trimming
-- Tool: Trimmomatic
-- Settings: Adapter removal + quality filtering (`SLIDINGWINDOW`, `MINLEN`)
+Setup and Installation <a name="setup"></a>
+Follow these steps to set up the project environment locally.
+Prerequisites:
+ * Git
+ * Miniconda or Anaconda
+ * Clone Repository:
+   git clone [https://github.com/LilValero/Human-Exome-Variant-calling-Using-Illumina-Data.git](https://github.com/LilValero/Human-Exome-Variant-calling-Using-Illumina-Data.git)
+cd Human-Exome-Variant-calling-Using-Illumina-Data
 
-### 4. 🧬 Reference Genome
-- Source: Ensembl GRCh38 release 110 (chr22)
-- Indexing: `bwa index`
+ * Create Conda Environment:
+   This command uses the provided environment.yml file to install all necessary tools with the correct versions.
+   conda env create -f environment.yml
+conda activate variant_calling_env # Activate the created environment
 
-### 5. 🧷 Alignment
-- Tool: BWA MEM
-- Output: `aligned.sam`, converted/sorted/indexed to BAM
+ * Prepare Input Data:
+   * Place raw paired-end FASTQ files (*.fastq.gz) in the data/ directory.
+   * Place the reference genome FASTA file (.fasta or .fa) in data/reference/.
+   * Place the Trimmomatic adapter sequence file (.fa) in data/adapters/.
+   * Ensure the required SnpEff database (e.g., GRCh38.p13.RefSeq) is available to SnpEff. This may involve running snpEff download <database_name> if it's the first time using it.
+Usage <a name="usage"></a>
+ * Configure Pipeline:
+   * Open pipeline.sh in a text editor.
+   * Modify the variables within the --- Configuration --- section to match your input file names/paths (FASTQ_R1, FASTQ_R2, SAMPLE_NAME, REF_GENOME, ADAPTERS) and SnpEff settings (SNPEFF_DB, SNPEFF_CONFIG).
+ * Make Executable:
+   (Only needed once) Grant execute permissions to the script:
+   chmod +x pipeline.sh
 
-### 6. 🔎 Variant Calling
-- Tool: `bcftools mpileup` + `bcftools call`
-- Output: `variants.vcf` (8,719 raw variants)
+ * Run Pipeline:
+   Execute the script from the project's root directory:
+   ./pipeline.sh
 
-### 7. 🧠 Annotation
-- Tool: SnpEff with GRCh38.86 database
-- Output: `annotated_variants.vcf`
-- Summary: `snpeff_summary.html` (HTML report)
-
-### 8. 🎯 High-Impact Extraction
-- `grep "HIGH"` to isolate functionally significant variants → `high_impact_variants.vcf`
-
----
-
-## 📂 Repository Structure
-
-```
-exome_project/
-├── data/                          # Raw FASTQ and reference
-├── qc/                            # FastQC + MultiQC outputs
-├── results/                       # BAM, VCF, snpEff output
-├── scripts/                       # (optional) pipeline.sh
-├── snpeff_summary.html            # HTML annotation summary
-├── README.md                      # This file
-```
-
----
-
-## 📈 GitHub Pages Report
-
-[Click to View Variant Annotation Report](https://yourusername.github.io/exome_variant_pipeline/snpeff_summary.html)
-
-Includes:
-- Distribution of variant impacts
-- Top affected genes
-- Effect categories (e.g., missense, nonsense)
-
----
-
-## 🧪 Technologies Used
-- `conda` for reproducible environment management
-- `bash` for scripting and pipeline chaining
-- `bioconda` for easy installation of genomics tools
-- `GitHub Pages` for hosting visual outputs
-
----
-
-## 🧬 Keywords / Tags (for discoverability)
-```
-bioinformatics, variant calling, snpeff, exome, FASTQ, VCF, bwa, samtools, bcftools, Illumina, human genome, GRCh38, next-generation sequencing, cancer genomics, data science, computational biology
-```
-
----
-
-## ✅ Resume-Friendly Project Line
-> Built a complete Illumina exome variant-calling pipeline from raw FASTQ to annotated VCF using BWA, SAMtools, bcftools, and snpEff. Identified 8,700+ variants, extracted high-impact mutations, and generated a public HTML annotation summary using GitHub Pages.
-
-
+   Pipeline progress and tool-specific output will be directed to log files within the logs/ directory.
+Results <a name="results"></a>
+Upon successful completion, the pipeline generates several key outputs:
+ * 📄 SnpEff Annotation Summary: An interactive HTML report detailing variant annotations.
+   * View SnpEff Report (Live Demo)
+ * 📈 MultiQC Aggregate Report: A comprehensive HTML report summarizing QC metrics from various pipeline stages.
+   * View MultiQC Report (Live Demo)
+ * 🧬 Annotated Variants: The final annotated variant calls are available in VCF format at: variants/snpEff_annotation/<SAMPLE_NAME>.annotated.vcf.gz
+Intermediate files (trimmed reads, alignments, raw VCFs) are stored in their respective directories (trimmed/, alignment/, variants/).
+Contributing <a name="contributing"></a>
+Contributions, issues, and feature requests are welcome. Please refer to the issues page.
+License <a name="license"></a>
+This project is licensed under the MIT License. See the LICENSE file for full details.
