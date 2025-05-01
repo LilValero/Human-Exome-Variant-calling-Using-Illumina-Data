@@ -1,3 +1,63 @@
+# --- Data Files ---
+# Ignore raw sequence data (usually large and obtained from public repos)
+*.fastq.gz
+*.fq.gz
+*.sra
+
+# Ignore intermediate trimmed data
+trimmed/
+
+# Ignore large reference files (assume downloaded separately)
+# data/reference/*.fasta
+# data/reference/*.fa
+# data/reference/*.fna
+data/reference/*.amb
+data/reference/*.ann
+data/reference/*.bwt
+data/reference/*.pac
+data/reference/*.sa
+
+# --- Alignment Files ---
+# Ignore large alignment files and their indices
+alignment/*.bam
+alignment/*.sam
+alignment/*.bai
+alignment/*.cram
+alignment/*.crai
+
+# --- Variant Files ---
+# Ignore intermediate or raw VCFs unless specifically needed
+variants/*.raw.*vcf*
+variants/*.call.*vcf*
+variants/*.vcf.gz.tbi # Often ignore index, keep final VCF maybe
+# Consider keeping the FINAL annotated VCF if it's small enough
+# !variants/snpEff_annotation/*.annotated.vcf.gz
+
+# --- Tool Specific Files ---
+# Ignore SnpEff database downloads if stored locally within project
+snpEff/data/
+
+# Ignore log files (unless you want to track specific small logs)
+logs/
+*.log
+
+# Ignore Conda environment directory
+variant_calling_env/ # Or whatever you name your env directory if created locally
+
+# --- OS/Editor Files ---
+.DS_Store
+*.swp
+*~
+.vscode/
+*.pyc
+
+# --- Output Reports ---
+# IMPORTANT: Do NOT ignore the files served by GitHub Pages
+# !docs/snpeff_summary.html
+# !docs/multiqc_report.html
+# Keep other files in docs/ tracked unless intentionally ignored
+
+
 *.bam
 *.sam
 *.fastq.gz
