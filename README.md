@@ -60,7 +60,13 @@ conda activate variant_calling_env # Activate the created environment
 
  * Prepare Input Data:
    * Place raw paired-end FASTQ files (*.fastq.gz) in the data/ directory.
-   * Place the reference genome FASTA file (.fasta or .fa) in data/reference/.
+   * Download & index the full GRCh38 primary assembly (all chromosomes) on‐the‐fly:
+  ```bash
+  REF=Homo_sapiens.GRCh38.dna.primary_assembly.fa
+  mkdir -p data
+  curl -O ftp://ftp.ensembl.org/pub/release-110/fasta/homo_sapiens/dna/${REF}.gz
+  gunzip ${REF}.gz
+  bwa index data/${REF}
    * Place the Trimmomatic adapter sequence file (.fa) in data/adapters/.
    * Ensure the required SnpEff database (e.g., GRCh38.p13.RefSeq) is available to SnpEff. This may involve running snpEff download <database_name> if it's the first time using it.
 Usage <a name="usage"></a>

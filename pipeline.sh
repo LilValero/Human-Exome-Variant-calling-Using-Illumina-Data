@@ -8,7 +8,7 @@ set -e -o pipefail # Exit on error, treat errors in pipes as failure
 FASTQ_R1="data/SRRXXXXXX_1.fastq.gz" # CHANGE to your Read 1 FASTQ file
 FASTQ_R2="data/SRRXXXXXX_2.fastq.gz" # CHANGE to your Read 2 FASTQ file
 SAMPLE_NAME="SRRXXXXXX"             # CHANGE to your sample identifier
-REF_GENOME="data/reference/your_reference.fasta" # CHANGE to your reference genome path
+REF_GENOME="data/Homo_sapiens.GRCh38.dna.primary_assembly.fa" # CHANGE to your reference genome path
 ADAPTERS="data/adapters/TruSeq3-PE-2.fa"      # CHANGE to your Trimmomatic adapter file path
 
 # SnpEff Settings
@@ -65,15 +65,17 @@ echo "[$(date +%T)] Running FastQC on trimmed reads..."
 fastqc -t "${THREADS}" -o "${QC_DIR}" "${TRIM_R1_PAIRED}" "${TRIM_R2_PAIRED}" &> "${LOG_DIR}/${SAMPLE_NAME}_fastqc_trimmed.log"
 echo "[$(date +%T)] FastQC on trimmed reads complete."
 
-# --- Step 4: Reference Genome Indexing (BWA) ---
-# Check if index exists, create if not
-if [[ ! -f "${REF_GENOME}.bwt" ]]; then
-    echo "[$(date +%T)] Indexing reference genome with BWA..."
-    bwa index "${REF_GENOME}" &> "${LOG_DIR}/bwa_index.log"
-    echo "[$(date +%T)] BWA indexing complete."
-else
-    echo "[$(date +%T)] BWA index found."
+# --- Step 4: Download & index full GRCh38 primary assembly ---
+if [[ ! -f "$REF_GENOME" ]]; then
+  mkdir -p data
+  cd data
+  curl -O ftp://ftp.ensembl.org/pub/release-110/fasta/homo_sapiens/dna/Homo_sapiens.GRCh38.dna.primary_assembly.fa.gz
+  gunzip Homo_sapiens.GRCh38.dna.primary_assembly.fa.gz
+  cd ..
 fi
+echo "[$(date +%T)] Indexing full GRCh38 with BWA…"
+bwa index "$REF_GENOME"
+echo "[$(date +%T)] BWA indexing complete."
 
 # --- Step 5: Alignment (BWA-MEM) and Sorting (SAMtools) ---
 echo "[$(date +%T)] Aligning reads with BWA-MEM and sorting..."
